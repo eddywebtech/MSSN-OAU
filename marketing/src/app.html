@@ -4,15 +4,14 @@
 <head>
 	<meta charset="utf-8" />
 	<meta name="theme-color" content="#003a1c">
-	<link rel="icon" href="%sveltekit.assets%/favicon.ico" />
+	<link rel="icon" href="/favicon.ico" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<meta name="description" content="Muslim Students Society of Nigeria, Obafemi Awolowo University Branch">
 
 	<!-- Cache Control -->
 	<meta http-equiv="Cache-Control" content="max-age=86400" />
 
-	<!-- Security Headers - X-Content-Type-Options is managed by SvelteKit's CSP or hosting headers -->
-	<!-- The static CSP meta tag has been removed in favor of svelte.config.js CSP -->
+	<!-- Security Headers -->
 	<meta http-equiv="X-Content-Type-Options" content="nosniff" />
 
 	<!-- Performance Optimizations -->
@@ -26,19 +25,19 @@
 	<link rel="preconnect" href="https://api.aladhan.com" crossorigin>
 	<link rel="preconnect" href="https://va.vercel-scripts.com" crossorigin>
 
-	<link rel="preload" href="%sveltekit.assets%/mssn-logo.webp" as="image" fetchpriority="high" />
-	<link rel="preload" href="%sveltekit.assets%/images/pattern.svg" as="image" fetchpriority="auto" />
+	<link rel="preload" href="/mssn-logo.webp" as="image" fetchpriority="high" />
+	<link rel="preload" href="/images/pattern.svg" as="image" fetchpriority="auto" />
 	<!-- Preload and asynchronously load Scheherazade New font CSS -->
 	<link rel="preload" href="https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@600&display=swap"
 		as="style" />
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@600&display=swap">
 
 	<!-- PWA Support -->
-	<link rel="apple-touch-icon" href="%sveltekit.assets%/apple-touch-icon.webp" />
+	<link rel="apple-touch-icon" href="/apple-touch-icon.webp" />
 	<link rel="manifest" href="/app.webmanifest" />
 
 	<!-- Critical CSS for initial render -->
-	<style nonce="%sveltekit.nonce%">
+	<style>
 		:root {
 			--background: 0 0% 100%;
 			--foreground: 0 0% 3.9%;
@@ -122,12 +121,6 @@
 	<meta name="sentry-trace" content="ecfd9c2bcd2df0ec4729f2cd9468623c-1d3b2227cc96377a-1" />
 	<meta name="baggage"
 		content="sentry-environment=production,sentry-public_key=8a6c37d91d61d59f93315969a077bace,sentry-trace_id=ecfd9c2bcd2df0ec4729f2cd9468623c,sentry-sample_rate=1,sentry-transaction=GET%20%2Fcontact%2F,sentry-sampled=true" />
-
-	<script>
-		// * Exposes a nonce placeholder for legacy client-side script injection.
-		// * When prerendering with CSP mode 'auto', SvelteKit uses hashes (not nonces) for inline scripts.
-		window.APP_NONCE = '';
-	</script>
 
 	%sveltekit.head%
 </head>

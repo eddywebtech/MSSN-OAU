@@ -1,6 +1,7 @@
 <script>
     import {toast} from "svelte-sonner";
     import { Image } from '$lib/components/ui/image';
+    import { API_BASE } from '$lib/api/base';
 </script>
 
 <!-- ========== FOOTER ========== -->
@@ -61,6 +62,9 @@
                            href="/programmes">Programmes</a></p>
                     <p>
                         <a class="inline-flex gap-x-2 text-gray-700 hover:text-primary-700 transition-colors"
+                           href="/al-mamharah">Al-Mamharah</a></p>
+                    <p>
+                        <a class="inline-flex gap-x-2 text-gray-700 hover:text-primary-700 transition-colors"
                             href="/events">Events</a></p>
                     <p>
                         <a class="inline-flex gap-x-2 text-gray-700 hover:text-primary-700 transition-colors"
@@ -81,9 +85,6 @@
                            href="/blog">Blog</a></p>
                     <p>
                         <a class="inline-flex gap-x-2 text-gray-700 hover:text-primary-700 transition-colors"
-                           href="/#donate">Donate</a></p>
-                    <p>
-                        <a class="inline-flex gap-x-2 text-gray-700 hover:text-primary-700 transition-colors"
                            href="/#prayer-times">Prayer Times</a></p>
                     <p>
                         <a class="inline-flex gap-x-2 text-gray-700 hover:text-primary-700 transition-colors"
@@ -98,16 +99,39 @@
                     <span class="absolute -bottom-1 left-0 w-8 h-0.5 bg-primary-700/70 rounded-full"></span>
                 </h2>
 
-                <form>
+                <form onsubmit={async (e) => {
+                    e.preventDefault();
+                    const input = e.target.querySelector('input');
+                    const userEmail = input?.value?.trim()?.toLowerCase();
+                    if (!userEmail || !userEmail.includes('@')) {
+                        toast.error("Please enter a valid email address.");
+                        return;
+                    }
+                    try {
+                        const res = await fetch(`${API_BASE}/public/newsletter/subscribe`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email: userEmail })
+                        });
+                        const json = await res.json();
+                        if (json.success) {
+                            toast.success(json.data?.message || "Successfully subscribed to our newsletter!");
+                            input.value = "";
+                        } else {
+                            toast.error(json.error || "Subscription failed. Try again.");
+                        }
+                    } catch {
+                        toast.error("Unable to connect to subscription server.");
+                    }
+                }}>
                     <div class="mt-4 flex flex-col items-center gap-2 sm:flex-row sm:gap-3 bg-white/80 backdrop-blur-sm rounded-xl p-2 shadow-sm border border-primary-100/50">
                         <div class="w-full">
-                            <label for="hero-input" class="sr-only">Subscribe</label>
-                            <input type="text" id="hero-input" name="hero-input"
+                            <label for="footer-email-input" class="sr-only">Subscribe</label>
+                            <input type="email" id="footer-email-input" name="email" required
                                    class="py-3 px-4 block w-full border-transparent rounded-xl text-sm focus:border-primary-700 focus:ring-primary-700 disabled:opacity-50 disabled:pointer-events-none"
                                    placeholder="Enter your email">
                         </div>
-                        <button class="w-full font-secondary sm:w-auto whitespace-nowrap p-3 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-xl border border-transparent bg-primary-700 text-white hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-primary-600 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:pointer-events-none"
-                                onclick={() => toast.warning("Newsletter is currently unavailable.")}>
+                        <button type="submit" class="w-full font-secondary sm:w-auto whitespace-nowrap p-3 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-xl border border-transparent bg-primary-700 text-white hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-primary-600 focus:ring-offset-2 transition-all">
                             Subscribe
                         </button>
                     </div>

@@ -1,13 +1,7 @@
-// * Use mocked data directly (no server-side fetching)
-import { mockAdvisors } from "$lib/mocks/data.js";
+import { loadSiteData } from '$lib/api/site-data.js';
 
-/**
- * Loads the advisor data for the page.
- * @returns {Promise<{ sessions: import('$lib/types.js').AdvisorSessionData[] }>}
- * The advisor data with sessions array.
- */
-export const load = async () => {
-    return {
-        sessions: mockAdvisors.advisors.sessions
-    };
+export const load = async ({ fetch }) => {
+	const data = await loadSiteData(fetch, ['advisors']);
+
+	return { advisors: data.advisors || [] };
 };

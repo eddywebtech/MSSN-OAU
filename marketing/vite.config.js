@@ -21,17 +21,62 @@ export default defineConfig({
                 comments: false // Remove all comments
             }
         },
-        // Disable chunking to avoid initialization order issues
         rollupOptions: {
             output: {
-                manualChunks: () => 'app' // Put everything in one chunk
+                // NOTE: manualChunks is intentionally NOT used here. Forcing svelte
+                // and other vendor libs into custom chunks created a circular
+                // dependency between chunks that broke the SSR output with
+                // "Cannot access 'Ft' before initialization". Let Vite split chunks
+                // naturally instead.
             }
         },
-        // Reduce initial load time
         cssCodeSplit: true,
         assetsInlineLimit: 4096, // Inline small assets (4kb or less)
         chunkSizeWarningLimit: 1000
     },
+
+    // Pre-bundle heavy dependencies to speed up dev cold starts significantly
+    optimizeDeps: {
+        include: [
+            'date-fns',
+            'clsx',
+            'tailwind-merge',
+            'mode-watcher',
+            'svelte-sonner',
+            'he',
+            'timeago.js',
+            'reading-time-estimator',
+            'svelte-meta-tags'
+        ],
+        // embla-carousel has circular re-exports that break the dep optimizer,
+        // causing "Cannot access 'X' before initialization" and killing HMR.
+        exclude: ['embla-carousel', 'embla-carousel-svelte', 'embla-carousel-autoplay']
+    },
+
+    // Pre-transform the most commonly accessed files on dev server start
+    server: {
+        warmup: {
+            clientFiles: [
+                './src/routes/+layout.svelte',
+                './src/routes/+page.svelte',
+                './src/app.css'
+            ]
+        },
+        fs: {
+            allow: ['.']
+        },
+        // Fix HMR WebSocket failures (common on Windows): force the client to
+        // reconnect to ws://localhost explicitly and relax the origin allowlist.
+        host: true,
+        allowedHosts: true,
+        hmr: {
+            protocol: 'ws',
+            host: 'localhost',
+            port: 5173,
+            clientPort: 5173
+        }
+    },
+
 	plugins: [
         // Temporarily comment out Sentry plugins
         // sentryVitePlugin({

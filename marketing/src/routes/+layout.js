@@ -1,13 +1,16 @@
 import { browser } from '$app/environment';
+import { loadSiteData } from '$lib/api/site-data.js';
 
 export const trailingSlash = 'always';
 export const ssr = true;
 export const csr = true; // Enable client-side rendering for hydration
 
 // Add route-based code splitting
-export const load = async ({ route }) => {
-    // * Use mocked data directly (no server-side fetching)
-    const dataPromise = fetchSiteData();
+export const load = async ({ route, fetch }) => {
+    // Load the site data needed on every page. Heavy, page-specific payloads
+    // (excos, advisors) are loaded by their own routes' loaders instead, so they
+    // don't slow down unrelated pages (especially the home page).
+    const dataPromise = loadSiteData(fetch, ['info', 'events', 'programmes', 'mosques', 'latestNews', 'posts', 'alumni']);
 
     // Client-side only code
     if (browser) {
@@ -111,8 +114,9 @@ async function loadClientSideTools() {
             }
         });
 
-        // Register service worker for improved caching
-        if ('serviceWorker' in navigator) {
+        // Register service worker for improved caching (production only)
+        // In dev mode, the SW intercepts Vite's module requests and causes huge slowdowns
+        if ('serviceWorker' in navigator && import.meta.env.PROD) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/service-worker.js')
                     .catch(error => {
@@ -124,19 +128,4 @@ async function loadClientSideTools() {
         console.error('Error loading client tools:', error);
         // Non-critical, so we can continue without throwing
     }
-}
-
-// * Use mocked data directly (no server-side fetching)
-import { mockInfo } from "$lib/mocks/data.js";
-
-/**
- * * Returns mocked site data (client-side data, no external APIs)
- * @returns {Promise<Object>} Site data object
- */
-async function fetchSiteData() {
-    return {
-        info: mockInfo,
-        events: [],
-        posts: []
-    };
 }
